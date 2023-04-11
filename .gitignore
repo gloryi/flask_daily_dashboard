@@ -15,6 +15,7 @@ report.json
 reports/
 daily.json
 __pln_manual/
+$XDG_STATE_HOME
 
 # C extensions
 *.so
