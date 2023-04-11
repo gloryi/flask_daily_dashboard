@@ -6,6 +6,7 @@ from mu_selectors import parse_wiki_list, parse_in_depth, from_directory
 import daily_processor
 from datetime import datetime
 import json
+from itertools import groupby
 
 from config import DAILY_PLAN
 from config import PLANNING_SCHEMA
@@ -41,6 +42,7 @@ BINARY_FLAGS["group_activities"] = False
 BINARY_FLAGS["sort_activities"] = False
 
 daily_stack_activities = []
+daily_stack_formatted = []
 daily_stack_cycles = []
 #  daily_marked = []
 #  daily_rest = []
@@ -135,6 +137,7 @@ def prepare_mu_rec():
 def my_view_func(marked_id):
     global daily_loaded
     global daily_stack_activities
+    global daily_stack_formatted
 
     label = lambda _: _[0]
     time = lambda _ : _[1]["time_estem"]
@@ -166,6 +169,20 @@ def my_view_func(marked_id):
                 found = True
                 break
 
+    if not GROUP_REPORT:
+        daily_stack_formatted = daily_stack_activities[::]
+    else:
+        daily_stack_formatted = []
+        for group, entries in groupby(daily_stack_activities, key = lambda _ : _[1]):
+            entries = list(entries)
+            group_id = group
+            label = group
+            time_act = entries[0][2]
+            last_time = entries[-1][3]
+            time_percent = "Total: " + str(sum(_[4] for _ in entries)) +\
+                    " Avg = " + str(sum(_[4] for _ in entries)) + " N = " + str(len(entries))
+            daily_stack_formatted.append([group_id, label, time_act, last_time, time_percent])
+
     return redirect("/mu/")
 
 @app.route("/mu/", methods=["GET"])
@@ -182,10 +199,16 @@ def mu():
         meta_rel = int(rel_time/rel_day*1000)
         return render_template('mu.html', mu_reccomendation=rec,
                 fast_link=fast_link, daily_labels = daily_labels, rest_labels=rest_labels,
-                rel_time = rel_time, rel_day=rel_day, meta_rel=meta_rel, daily_stack = daily_stack_activities)
+                rel_time = rel_time, rel_day=rel_day, meta_rel=meta_rel, daily_stack = daily_stack_formatted)
     except Exception as e:
         print(e)
         return redirect("/mu/")
+
+@app.route("/groupping/", methods=["GET"])
+def groupping():
+    global GROUP_REPORT
+    GROUP_REPORT = False if GROUP_REPORT else True
+    return redirect('/mark/RE;FR;ESH')
 
 @app.route("/save/", methods=["GET"])
 def save():
