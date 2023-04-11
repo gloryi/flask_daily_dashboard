@@ -1,0 +1,12 @@
+{
+  "known_activities" : {
+    "Important task 1" : {"time_estem": 20, "resources": [], "values": []},
+    "Important task 2" : {"time_estem": 5, "resources": [], "values": []},
+    "Important task 3" : {"time_estem": 10, "resources": [], "values": []}
+  },
+  "cycles" : {
+    "morning" : ["Important task 1", "Important task 2"],
+    "midday" : ["Important task 2", "Important task 3"],
+    "evening": ["Important task 3", "Important task 1"]
+  }
+}

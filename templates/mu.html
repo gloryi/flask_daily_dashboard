@@ -1,0 +1,40 @@
+<link rel="stylesheet" href="https://unpkg.com/purecss@2.1.0/build/pure-min.css" integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH" crossorigin="anonymous">
+<div><center><h1>{{rel_time }} % | {{ rel_day }} % ||| {{ meta_rel }}</h1></center></div>
+</br>
+<div style: "display: flex; flex-direction: column; min-height: 100vh;">
+  </br>
+  <div><h1><center>{{mu_reccomendation}}</center></h1></div>
+  <div><h1><center><a href={{fast_link}}>SOUNDCLOUD</a></center></h1></div>
+  </br>
+  {% for daily_label in daily_labels  %}
+    <div><h3><center>
+          {% for activity in daily_label%}
+
+          {% if activity is iterable and (activity is not string and activity is not mapping) %}
+           {% if activity[2] %} <s> {% endif %} <a href="/mark/{{activity[1]}}">{{ activity[0] }}</a> {% if activity[2] %} </s> {% endif %}
+          {% else %}
+            {{ activity}}
+          {% endif %}
+          {% endfor %}</center></h3></div>
+  {% endfor %}
+
+  <div><h1><center><a href="/mu/">try another</a> <a href="/save/">save</a> <a href="/load/">load</a></center></h1></div>
+
+  {% for daily_label in rest_labels  %}
+    <div><h3><center>
+          {% for activity in daily_label%}
+
+          {% if activity is iterable and (activity is not string and activity is not mapping) %}
+           {% if activity[2] %} <s> {% endif %} <a href="/mark/{{activity[1]}}">{{ activity[0] }}</a> {% if activity[2] %} </s> {% endif %}
+          {% else %}
+            {{ activity}}
+          {% endif %}
+          {% endfor %}</center></h3></div>
+  {% endfor %}
+    
+    <div><h3><center>
+    {% for marked in daily_stack  %}
+    {{ marked[1] }} {{ marked[4] }}%
+    {% endfor %}</center></h3></div>
+
+</div>
