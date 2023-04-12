@@ -34,10 +34,15 @@
     
     <div><h3><center>
 
-          <a href="/groupping/">TOUGLE GROUPPING</a>
+          <a href="/groupping_flag/">[GROUPPING] </a>
+          <a href="/total_flag/">[TOTAL] </a>
+          <a href="/average_flag/">[AVERAGE] </a>
+          <a href="/n_flag/">[N] </a>
+          </br>
 
     {% for marked in daily_stack  %}
-    {{ marked[1] }} {{ marked[4] }}%
+    {{ marked[1] }} {{ marked[4] }}
+    {% if loop.index %3 == 0 %} </br> {% endif %}
     {% endfor %}</center></h3></div>
 
 </div>

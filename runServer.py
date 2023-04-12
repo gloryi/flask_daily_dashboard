@@ -14,6 +14,9 @@ TEST = True
 #TEST = False
 
 GROUP_REPORT = True
+SORT_BY_TOTAL = True
+SORT_BY_AVG = False
+SORT_BY_N = False
 
 app = Flask(__name__)
 
@@ -173,15 +176,27 @@ def my_view_func(marked_id):
         daily_stack_formatted = daily_stack_activities[::]
     else:
         daily_stack_formatted = []
-        for group, entries in groupby(daily_stack_activities, key = lambda _ : _[1]):
+        sorted_activities = daily_stack_activities[::]
+        sorted_activities.sort(key = lambda _ : _[1])
+        for group, entries in groupby(sorted_activities, key = lambda _ : _[1]):
             entries = list(entries)
             group_id = group
             label = group
             time_act = entries[0][2]
             last_time = entries[-1][3]
-            time_percent = "Total: " + str(sum(_[4] for _ in entries)) +\
-                    " Avg = " + str(sum(_[4] for _ in entries)) + " N = " + str(len(entries))
-            daily_stack_formatted.append([group_id, label, time_act, last_time, time_percent])
+            total = sum(_[4] for _ in entries)*time_act//100
+            avg = sum(_[4] for _ in entries)/len(entries)
+            n = len(entries)
+            time_percent = "Total: " + str(total) +\
+                    "m Avg = " + str(avg) + "% N = " + str(n) +"x |"
+            time_percent = time_percent.rjust(50, " ")
+            daily_stack_formatted.append([group_id, label, time_act, last_time, time_percent, total, avg, n])
+        if SORT_BY_TOTAL:
+            daily_stack_formatted.sort(key = lambda _ : _[5])
+        elif SORT_BY_AVG:
+            daily_stack_formatted.sort(key = lambda _ : _[6])
+        else:
+            daily_stack_formatted.sort(key = lambda _ : _[7])
 
     return redirect("/mu/")
 
@@ -204,11 +219,43 @@ def mu():
         print(e)
         return redirect("/mu/")
 
-@app.route("/groupping/", methods=["GET"])
+@app.route("/groupping_flag/", methods=["GET"])
 def groupping():
     global GROUP_REPORT
     GROUP_REPORT = False if GROUP_REPORT else True
     return redirect('/mark/RE;FR;ESH')
+
+@app.route("/total_flag/", methods=["GET"])
+def total_sort():
+    global SORT_BY_TOTAL
+    global SORT_BY_AVG
+    global SORT_BY_N
+    SORT_BY_TOTAL = True
+    SORT_BY_AVG = False
+    SORT_BY_N = False
+    return redirect('/mark/RE;FR;ESH')
+
+@app.route("/average_flag/", methods=["GET"])
+def average_sort():
+    global SORT_BY_TOTAL
+    global SORT_BY_AVG
+    global SORT_BY_N
+    SORT_BY_TOTAL = False
+    SORT_BY_AVG = True
+    SORT_BY_N = False
+    return redirect('/mark/RE;FR;ESH')
+
+@app.route("/n_flag/", methods=["GET"])
+def n_sort():
+    global SORT_BY_TOTAL
+    global SORT_BY_AVG
+    global SORT_BY_N
+    SORT_BY_TOTAL = False
+    SORT_BY_AVG = False
+    SORT_BY_N = True
+    return redirect('/mark/RE;FR;ESH')
+
+
 
 @app.route("/save/", methods=["GET"])
 def save():
@@ -245,7 +292,7 @@ def load():
         #  daily_marked = report["daily_marked"]
         #  daily_rest = report["daily_rest"]
 
-    return redirect("/mu/")
+    return redirect('/mark/RE;FR;ESH')
 
 if __name__ == '__main__':
     app.secret_key = 'test app secret key'
