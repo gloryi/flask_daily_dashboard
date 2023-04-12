@@ -2,6 +2,10 @@ import random
 import os
 
 from flask import Flask, request, render_template, url_for, session, redirect, flash
+from flask import send_file
+from PIL import Image
+import io
+
 from mu_selectors import parse_wiki_list, parse_in_depth, from_directory
 import daily_processor
 from datetime import datetime
@@ -10,6 +14,8 @@ from itertools import groupby
 
 from config import DAILY_PLAN
 from config import PLANNING_SCHEMA
+from config import RANDOM_BACKGORUNDS 
+import random
 TEST = True
 #TEST = False
 
@@ -258,6 +264,17 @@ def n_sort():
     SORT_BY_N = True
     return redirect('/mark/RE;FR;ESH')
 
+@app.route('/image')
+def prepare_random_image():
+    img = Image.open(random.choice(RANDOM_BACKGORUNDS))
+    image_io = io.BytesIO()
+    img.save(image_io, format='PNG')
+    image_io.seek(0)
+    return send_file(
+        image_io,
+        as_attachment=False,
+        mimetype='image/png'
+    )
 
 
 @app.route("/save/", methods=["GET"])
