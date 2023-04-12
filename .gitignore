@@ -16,6 +16,8 @@ reports/
 daily.json
 __pln_manual/
 $XDG_STATE_HOME
+system_level_utils/*.csv
+
 
 # C extensions
 *.so
