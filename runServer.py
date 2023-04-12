@@ -33,12 +33,15 @@ daily_loaded = []
 
 dt = datetime.now()
 DATEFORMAT_UNIV = '%d/%m/%y %H:%M:%S.%f'
+DATEFORMAT_REPT = '%y%b%d'
 
 TMTS = lambda _ : _.strftime(DATEFORMAT_UNIV)
 STTM = lambda _ : datetime.strptime(_, DATEFORMAT_UNIV)
+TMTSR = lambda _ : _.strftime(DATEFORMAT_REPT)
+STTMR = lambda _ : datetime.strptime(_, DATEFORMAT_REPT)
 
-OPTIMAL_WAKE = datetime.now().replace(hour=7, minute=0).strftime(DATEFORMAT_UNIV)
-OPTIMAL_SLEEP = datetime.now().replace(hour=23, minute=55).strftime(DATEFORMAT_UNIV)
+OPTIMAL_WAKE = TMTS(datetime.now().replace(hour=7, minute=0))
+OPTIMAL_SLEEP = TMTS(datetime.now().replace(hour=23, minute=55))
 
 BINARY_FLAGS = {}
 BINARY_FLAGS["group_activities"] = False
@@ -265,15 +268,18 @@ def save():
     #  global daily_marked
     #  global daily_rest
     
+    report = {}
+    report["daily_loaded"] = daily_loaded
+    report["daily_stack_activities"] = daily_stack_activities
+    report["daily_stack_cycles"] = daily_stack_cycles
+
     with open("report.json", "w") as outfile:
-        report = {}
-        report["daily_loaded"] = daily_loaded
-        report["daily_stack_activities"] = daily_stack_activities
-        report["daily_stack_cycles"] = daily_stack_cycles
-        #  report["daily_marked"] = daily_marked
-        #  report["daily_rest"] = daily_rest
         json.dump(report, outfile, indent=2)
 
+    current_day = STTM(OPTIMAL_WAKE)
+    daily_name = TMTSR(current_day)
+    with open(os.path.join(os.getcwd(), "reports", daily_name+".json"), "w") as outfile:
+        json.dump(report, outfile, indent=2)
     return redirect("/mu/")
 
 @app.route("/load/", methods=["GET"])
